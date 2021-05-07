@@ -59,6 +59,11 @@ public class Product extends AEntity {
         this.cost=cost;
     }
 
+    public Product(String name, Double cost) {
+        this.name = name;
+        this.cost = cost;
+    }
+
     public String getName() {
         return name;
     }
