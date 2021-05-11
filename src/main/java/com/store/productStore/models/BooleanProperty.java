@@ -2,6 +2,7 @@ package com.store.productStore.models;
 
 import javax.persistence.*;
 
+
 @Entity
 @Table(name = "BooleanProperties")
 public class BooleanProperty extends Property {
@@ -20,10 +21,17 @@ public class BooleanProperty extends Property {
 
 
     public BooleanProperty(){}
+    public BooleanProperty(String propertyName, Boolean propertyValue, Product product) {
+        this.propertyName=propertyName;
+        this.propertyValue=propertyValue;
+        this.product=product;
+    }
     public BooleanProperty(String propertyName, Boolean propertyValue) {
         this.propertyName=propertyName;
         this.propertyValue=propertyValue;
+
     }
+
 
     @Override
     public String toString() {

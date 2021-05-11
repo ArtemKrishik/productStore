@@ -5,13 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<a href="/addProduct">добавить продукт</a>
+<a th:href="'/productCurtPage/'+${user.id}">корзина</a><br>
+
 <div th:each="product : ${products}">
     <h3 th:text="${product.name}"></h3>
     <h3 th:text="${product.cost}"></h3>
 
-    <a th:href="'/productDelete/'+${product.id}">удалить</a><br>
-    <a th:href="'/productInfo/'+${product.id}">информация о продукте</a><br>
+    <a th:href="'/buyProduct/'+${product.id}+'/'+${user.id}">в корзину</a><br>
+    <a th:href="'/productInfoForUser/'+${product.id}">информация о продукте</a><br>
 </div>
 
 </body>

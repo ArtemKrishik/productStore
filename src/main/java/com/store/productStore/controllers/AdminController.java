@@ -6,7 +6,7 @@ import com.store.productStore.models.BooleanProperty;
 import com.store.productStore.models.NumericalProperty;
 import com.store.productStore.models.Product;
 import com.store.productStore.models.User;
-import com.store.productStore.repositories.BooleanPropertiesRepository;
+import com.store.productStore.repositories.BooleanPropertyRepository;
 import com.store.productStore.repositories.NumericalPropertiesRepository;
 import com.store.productStore.repositories.ProductRepository;
 import com.store.productStore.repositories.UserRepository;
@@ -16,22 +16,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 
 
 @Controller
-public class MainController {
-
+public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    private BooleanPropertiesRepository booleanPropertiesRepository;
+    private BooleanPropertyRepository booleanPropertyRepository;
     @Autowired
     private NumericalPropertiesRepository numericalPropertiesRepository;
+
 
     @GetMapping("/pageOfUsers")
     public String greeting( Model model) {
@@ -92,19 +91,81 @@ public class MainController {
 
 
 
+    @PostMapping("/addBoolProperty/{id}")
+    public String addBooleanProperty(@PathVariable(value = "id") long id, Model model, @RequestParam String name, @RequestParam String valueOfProperty) {
+
+        Optional<Product> product=productRepository.findById(id);
+
+        ArrayList<Product>prod=new ArrayList<>();
+        product.ifPresent(prod::add);
+        BooleanProperty booleanProperty;
+        if(valueOfProperty.equals("true")){
+            booleanProperty = new BooleanProperty(name, true, prod.get(0));
+        }
+        else{
+            booleanProperty = new BooleanProperty(name, false, prod.get(0));
+        }
+        booleanPropertyRepository.save(booleanProperty);
+
+        return "redirect:/productInfo/{id}";
+    }
+
+    @GetMapping("/addBooleanProperty/{id}")
+    public String addBoolean( @PathVariable(value = "id") long id, Model model) {
+
+        Optional<Product> product=productRepository.findById(id);
+
+        ArrayList<Product>prod=new ArrayList<>();
+        product.ifPresent(prod::add);
+        model.addAttribute("product", prod);
+        return "addBoolProperty";
+    }
+    @PostMapping("/addNumProperty/{id}")
+    public String addNumericalProperty(@PathVariable(value = "id") long id, Model model, @RequestParam String name, @RequestParam String valueOfProperty) {
+
+        Optional<Product> product=productRepository.findById(id);
+
+        ArrayList<Product>prod=new ArrayList<>();
+        product.ifPresent(prod::add);
+        NumericalProperty numericalProperty;
+
+        numericalProperty = new NumericalProperty(name, Double.parseDouble(valueOfProperty), prod.get(0));
+
+        numericalPropertiesRepository.save(numericalProperty);
+
+        return "redirect:/productInfo/{id}";
+    }
+
+    @GetMapping("/addNumericalProperty/{id}")
+    public String addNumerical( @PathVariable(value = "id") long id, Model model) {
+
+        Optional<Product> product=productRepository.findById(id);
+
+        ArrayList<Product>prod=new ArrayList<>();
+        product.ifPresent(prod::add);
+        model.addAttribute("product", prod);
+        return "addNumProperty";
+    }
+
+
+
     @GetMapping("/productInfo/{id}")
     public String changeInfoAboutProduct(@PathVariable(value = "id") long id, Model model) {
-        productRepository.findById(id);
+
         Optional<Product> product=productRepository.findById(id);
-        //Iterable<BooleanProperty> booleanProperties=booleanPropertiesRepository.findAllById(Collections.singleton(id));//ne tot id
-        //Iterable<NumericalProperty> numericalProperties=numericalPropertiesRepository.findAllById(Collections.singleton(id));//ne tot id
+        Iterable<BooleanProperty> booleanProperties=booleanPropertyRepository.findByProduct_Id(id);//ne tot id
+        Iterable<NumericalProperty> numericalProperties=numericalPropertiesRepository.findByProduct_Id(id);//ne tot id
         ArrayList<Product>prod=new ArrayList<>();
         product.ifPresent(prod::add);
         model.addAttribute("product", prod);
 
-        //model.addAttribute("booleanProperties", booleanProperties );
+        model.addAttribute("booleanProperties", booleanProperties );
 
-        //model.addAttribute("numericalProperties", numericalProperties );
+        model.addAttribute("numericalProperties", numericalProperties );
         return "pageOfProduct";
     }
+
+
+
+
 }

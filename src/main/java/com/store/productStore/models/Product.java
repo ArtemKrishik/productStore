@@ -24,6 +24,16 @@ public class Product extends AEntity {
     @JoinColumn(name = "UserId")
     private User user;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<User> users=new ArrayList<>();
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
 
     public User getUser() {
         return user;

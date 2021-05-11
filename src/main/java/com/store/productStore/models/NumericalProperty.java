@@ -25,6 +25,12 @@ public class NumericalProperty extends Property {
         this.propertyValue=propertyValue;
     }
 
+    public NumericalProperty(String propertyName, Double propertyValue, Product product) {
+        this.propertyName=propertyName;
+        this.propertyValue=propertyValue;
+        this.product=product;
+    }
+
     @Override
     public String toString() {
         return "DoubleProperty{" +

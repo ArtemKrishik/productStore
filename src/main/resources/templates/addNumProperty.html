@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>add</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div th:each="product : ${product}">
+
+    <form th:action="'/addNumProperty/'+${product.id}" method="post">
+
+        <input type="text" name="name" placeholder="имя" ><br><br>
+        <input type="text" name="valueOfProperty" placeholder="значение" ><br><br>
+        <button type="submit">добавить</button>
+
+    </form>
+
+
+</div>
+</body>
