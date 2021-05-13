@@ -26,7 +26,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private BooleanPropertyRepository booleanPropertyRepository;
+    private BooleanPropertyRepository booleanPropertiesRepository;
     @Autowired
     private NumericalPropertiesRepository numericalPropertiesRepository;
 
@@ -80,7 +80,7 @@ public class UserController {
 
                 String str="redirect:/catalog/"+user.getId().toString();
                 model.put("user", user);
-               // return "logInPage";
+                // return "logInPage";
                 return str;
             }else
             {
@@ -108,9 +108,8 @@ public class UserController {
     public String changeInfoAboutProduct(@PathVariable(value = "id") long id, Model model) {
 
         Optional<Product> product=productRepository.findById(id);
-        Iterable<BooleanProperty> booleanProperties= booleanPropertyRepository.findByProduct_Id(id);//ne tot id
-        Iterable<NumericalProperty> numericalProperties=numericalPropertiesRepository.findByProduct_Id(id);//ne tot id
-
+        Iterable<BooleanProperty> booleanProperties=booleanPropertiesRepository.findByProduct_Id(id);//ne tot id
+        Iterable<NumericalProperty> numericalProperties=numericalPropertiesRepository.findByProduct_Id(id);//ne tot i
         ArrayList<Product>prod=new ArrayList<>();
         product.ifPresent(prod::add);
         model.addAttribute("product", prod);

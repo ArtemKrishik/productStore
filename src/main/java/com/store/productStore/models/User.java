@@ -16,15 +16,15 @@ public class User extends AEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="Id")
     private Long id;
-    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    //private List<Product> productCart=new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Product> productCart=new ArrayList<>();
+
+    @ManyToMany( fetch = FetchType.EAGER)
+    private List<Product> productCart;
 
 
 
     public User() {
+        productCart=new ArrayList<>();
     }
 
 
@@ -36,7 +36,7 @@ public class User extends AEntity {
 
 
     public void addProductToProductCart(Product product) {
-        product.setUser(this);
+
         productCart.add(product);
     }
 

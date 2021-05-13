@@ -20,28 +20,20 @@ public class Product extends AEntity {
     private List<BooleanProperty> booleanProperties=new ArrayList<BooleanProperty>();
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,orphanRemoval = true)
     private List <NumericalProperty> numericalProperties=new ArrayList<NumericalProperty>();
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserId")
-    private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<User> users=new ArrayList<>();
 
-    public List<User> getUsers() {
-        return users;
-    }
+    //@ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    //private List<User> users=new ArrayList<>();
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+   // public List<User> getUsers() {
+     //   return users;
+    //}
 
-    public User getUser() {
-        return user;
-    }
+   // public void setUsers(List<User> users) {
+    //    this.users = users;
+    //}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+
 
     public List<NumericalProperty> getNumericalProperties() {
         return numericalProperties;
