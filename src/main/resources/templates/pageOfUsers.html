@@ -5,13 +5,23 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<a href="/addPage">добавить пользователя</a>
+<a href="/addPage">добавить администартора</a><br>
+
+<a >пользователи</a>
 <div th:each="user : ${users}">
   <h3 th:text="${user.name}"></h3>
   <h3 th:text="${user.password}"></h3>
   <a th:href="'/userDelete/'+${user.id}">удалить</a><br>
 
 </div>
+<br>
 
+<a >администраторы</a><br>
+<div th:each="admin : ${admins}">
+  <h3 th:text="${admin.name}"></h3>
+  <h3 th:text="${admin.password}"></h3>
+  <a th:href="'/adminDelete/'+${admin.id}">удалить</a><br>
+
+</div>
 </body>
 </html>

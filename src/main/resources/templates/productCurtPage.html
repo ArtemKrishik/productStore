@@ -5,13 +5,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-
+<h3 th:text="${cost}"></h3>
 <div th:each="product : ${products}">
     <h3 th:text="${product.name}"></h3>
     <h3 th:text="${product.cost}"></h3>
 
 
 </div>
+
+
+
+
+
+
 
 </body>
 

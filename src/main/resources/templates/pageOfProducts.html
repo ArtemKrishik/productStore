@@ -6,13 +6,31 @@
 </head>
 <body>
 <a href="/addProduct">добавить продукт</a>
-<div th:each="product : ${products}">
-    <h3 th:text="${product.name}"></h3>
-    <h3 th:text="${product.cost}"></h3>
 
-    <a th:href="'/productDelete/'+${product.id}">удалить</a><br>
-    <a th:href="'/productInfo/'+${product.id}">информация о продукте</a><br>
-</div>
+<table>
+    <tr>
+        <th>название</th>
+        <th>цена</th>
+        <th>остаток</th>
+        <th>удалить</th>
+        <th>информация</th>
+    </tr>
+    <tr th:each="product : ${products}">
+        <th th:text="${product.name}"></th>
+        <th th:text="${product.cost}"></th>
+        <th th:text="${product.quantity}"></th>
+        <th><a th:href="'/productDelete/'+${product.id}">удалить</a></th>
+        <th><a th:href="'/productInfo/'+${product.id}">информация о продукте</a><br></th>
+
+    </tr>
+
+
+
+
+
+
+
+
 
 </body>
 

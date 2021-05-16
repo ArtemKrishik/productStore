@@ -2,20 +2,15 @@ package com.store.productStore.controllers;
 
 
 
-import com.store.productStore.models.BooleanProperty;
-import com.store.productStore.models.NumericalProperty;
-import com.store.productStore.models.Product;
-import com.store.productStore.models.User;
-import com.store.productStore.repositories.BooleanPropertyRepository;
-import com.store.productStore.repositories.NumericalPropertiesRepository;
-import com.store.productStore.repositories.ProductRepository;
-import com.store.productStore.repositories.UserRepository;
+import com.store.productStore.models.*;
+import com.store.productStore.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -25,6 +20,8 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private AdminRepository adminRepository;
+    @Autowired
     private ProductRepository productRepository;
     @Autowired
     private BooleanPropertyRepository booleanPropertyRepository;
@@ -33,9 +30,11 @@ public class AdminController {
 
 
     @GetMapping("/pageOfUsers")
-    public String greeting( Model model) {
+    public String pageOfUsers( Model model) {
         Iterable<User> users=userRepository.findAll();
         model.addAttribute("users", users);
+        Iterable<Administrator> admins=adminRepository.findAll();
+        model.addAttribute("admins", admins);
         return "pageOfUsers";
     }
 
@@ -48,8 +47,8 @@ public class AdminController {
 
     @PostMapping("/addPage")
     public String add(@RequestParam String name, @RequestParam String password, Model model) {
-        User user=new User(name, password);
-        userRepository.save(user);
+        Administrator admin=new Administrator(name, password);
+        adminRepository.save(admin);
 
         return "redirect:/pageOfUsers";
     }
@@ -61,6 +60,13 @@ public class AdminController {
         return "redirect:/pageOfUsers";
     }
 
+    @GetMapping("/adminDelete/{id}")
+    public String deleteAdmin(@PathVariable(value = "id") long id, Model model) {
+        adminRepository.deleteById(id);
+
+        return "redirect:/pageOfUsers";
+    }
+
     @GetMapping("/addProduct")
     public String addProduct( Model model) {
 
@@ -68,8 +74,8 @@ public class AdminController {
     }
 
     @PostMapping("/addProduct")
-    public String add(@RequestParam String name, @RequestParam Double price, Model model) {
-        Product product=new Product(name, price);
+    public String add(@RequestParam String name, @RequestParam Double price, @RequestParam Integer quantity, Model model) {
+        Product product=new Product(name, price, quantity);
         productRepository.save(product);
 
         return "redirect:/pageOfProducts";
@@ -84,6 +90,19 @@ public class AdminController {
 
     @GetMapping("/productDelete/{id}")
     public String deleteProduct(@PathVariable(value = "id") long id, Model model) {
+        Optional<Product> product=productRepository.findById(id);
+        ArrayList<Product>prod=new ArrayList<>();
+        product.ifPresent(prod::add);
+        List<User> users=prod.get(0).getUsers();
+        if(users.size()!=0)
+        {
+            for(User user : users)
+            {
+            user.removeProductFromProductCart(prod.get(0));
+            userRepository.save(user);
+            }
+
+        }
         productRepository.deleteById(id);
 
         return "redirect:/pageOfProducts";

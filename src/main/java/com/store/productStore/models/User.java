@@ -35,6 +35,17 @@ public class User extends AEntity {
     }
 
 
+    public Double getCostOfProductsInProductCart(){
+        Double cost=0.0;
+        for(Product p : productCart){cost+=p.getCost();}
+        return cost;
+    }
+
+    public void removeProductFromProductCart(Product product) {
+
+        productCart.remove(product);
+    }
+
     public void addProductToProductCart(Product product) {
 
         productCart.add(product);
