@@ -55,6 +55,17 @@ public class AdminController {
 
     @GetMapping("/userDelete/{id}")
     public String deleteUser(@PathVariable(value = "id") long id, Model model) {
+        Optional<User>user=userRepository.findById(id);
+        ArrayList<User>users=new ArrayList<>();
+        user.ifPresent(users::add);
+        List<Product>productCart=users.get(0).getProductCart();
+        if(productCart.size()!=0){
+            for(Product pr : productCart)
+            {
+                pr.removeUsersFromProduct(users.get(0));
+                productRepository.save(pr);
+            }
+        }
         userRepository.deleteById(id);
 
         return "redirect:/pageOfUsers";
@@ -89,21 +100,21 @@ public class AdminController {
     }
 
     @GetMapping("/productDelete/{id}")
-    public String deleteProduct(@PathVariable(value = "id") long id) {
+    public String deleteProduct(@PathVariable(value = "id") long id, Model model) {
         Optional<Product> product=productRepository.findById(id);
         ArrayList<Product>prod=new ArrayList<>();
         product.ifPresent(prod::add);
         List<User> users=prod.get(0).getUsers();
         if(users.size()!=0)
         {
-            for(User user : users){
-                user.removeProductFromProductCart(prod.get(0));
-                userRepository.save(user);
+            for(User user : users)
+            {
+            user.removeProductFromProductCart(prod.get(0));
+            userRepository.save(user);
             }
 
         }
-        productRepository.delete(prod.get(0));
-
+        productRepository.deleteById(id);
 
         return "redirect:/pageOfProducts";
     }

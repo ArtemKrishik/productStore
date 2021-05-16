@@ -2,6 +2,7 @@ package com.store.productStore.models;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -22,9 +23,9 @@ public class Product extends AEntity {
     private List<BooleanProperty> booleanProperties=new ArrayList<BooleanProperty>();
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,orphanRemoval = true)
     private List <NumericalProperty> numericalProperties=new ArrayList<NumericalProperty>();
-    @ManyToMany( fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany( fetch = FetchType.EAGER)
     private List<User> users;
-
+    
 
 
     public List<NumericalProperty> getNumericalProperties() {
@@ -93,6 +94,10 @@ public class Product extends AEntity {
         numericalProperty.setProduct(this);
     }
 
+
+    public void removeUsersFromProduct(User user){
+        users.removeAll(Collections.singleton(user));
+    }
 
     public List<User> getUsers() {
         return users;
