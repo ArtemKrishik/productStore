@@ -2,6 +2,8 @@ package com.store.productStore.models;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -18,7 +20,7 @@ public class User extends AEntity {
     private Long id;
 
 
-    @ManyToMany( fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<Product> productCart;
 
 
@@ -43,7 +45,7 @@ public class User extends AEntity {
 
     public void removeProductFromProductCart(Product product) {
 
-        productCart.remove(product);
+        productCart.removeAll(Collections.singleton(product));
     }
 
     public void addProductToProductCart(Product product) {

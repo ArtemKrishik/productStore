@@ -89,21 +89,21 @@ public class AdminController {
     }
 
     @GetMapping("/productDelete/{id}")
-    public String deleteProduct(@PathVariable(value = "id") long id, Model model) {
+    public String deleteProduct(@PathVariable(value = "id") long id) {
         Optional<Product> product=productRepository.findById(id);
         ArrayList<Product>prod=new ArrayList<>();
         product.ifPresent(prod::add);
         List<User> users=prod.get(0).getUsers();
         if(users.size()!=0)
         {
-            for(User user : users)
-            {
-            user.removeProductFromProductCart(prod.get(0));
-            userRepository.save(user);
+            for(User user : users){
+                user.removeProductFromProductCart(prod.get(0));
+                userRepository.save(user);
             }
 
         }
-        productRepository.deleteById(id);
+        productRepository.delete(prod.get(0));
+
 
         return "redirect:/pageOfProducts";
     }

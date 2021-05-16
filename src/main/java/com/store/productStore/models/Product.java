@@ -22,9 +22,9 @@ public class Product extends AEntity {
     private List<BooleanProperty> booleanProperties=new ArrayList<BooleanProperty>();
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL,orphanRemoval = true)
     private List <NumericalProperty> numericalProperties=new ArrayList<NumericalProperty>();
-    @ManyToMany( fetch = FetchType.EAGER)
+    @ManyToMany( fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<User> users;
-    
+
 
 
     public List<NumericalProperty> getNumericalProperties() {
