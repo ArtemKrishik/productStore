@@ -5,6 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
+
+
+<a th:href="'/catalog/'+${userId}">назад</a>
 <h3 th:text="${cost}"></h3>
 <div th:each="product : ${products}">
     <h3 th:text="${product.name}"></h3>

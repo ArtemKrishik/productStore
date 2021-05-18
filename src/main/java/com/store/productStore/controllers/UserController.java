@@ -1,60 +1,50 @@
 package com.store.productStore.controllers;
 
-
 import com.store.productStore.models.*;
-import com.store.productStore.repositories.*;
+import com.store.productStore.services.AdministratorService;
+import com.store.productStore.services.ProductService;
+import com.store.productStore.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
-
 
 @Controller
 public class UserController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private UserService userService;
     @Autowired
-    private UserRepository userRepository;
+    private AdministratorService administratorService;
     @Autowired
-    private BooleanPropertyRepository booleanPropertiesRepository;
-    @Autowired
-    private NumericalPropertiesRepository numericalPropertiesRepository;
-    @Autowired
-    private AdminRepository adminRepository;
+    private ProductService productService;
 
     @GetMapping("/homePage")
     public String homePage( Model model) {
-
         model.addAttribute(model);
         return "homePage";
     }
 
     @GetMapping("/logIn")
     public String logIn( Model model) {
-
         model.addAttribute(model);
         return "logInPage";
     }
 
     @GetMapping("/registration")
     public String registration( Model model) {
-
         model.addAttribute(model);
         return "registrationPage";
     }
 
     @PostMapping("/registration")
-    public String registrate(Map<String, Object> model, @RequestParam String login, @RequestParam String password, @RequestParam String repeatPassword) {
-        User user = userRepository.findByName(login);
-        Administrator admin = adminRepository.findByName(login);
-
+    public String registration(Map<String, Object> model, @RequestParam String login, @RequestParam String password, @RequestParam String repeatPassword) {
+        User user = userService.getUserByName(login);
+        Administrator admin = administratorService.getAdministratorByName(login);
         if (user==null && admin==null) {
             user=new User(login, password);
-            userRepository.save(user);
+            userService.addUser(user);
             String str="redirect:/catalog/"+user.getId().toString();
             model.put("user", user);
             return str;
@@ -66,9 +56,10 @@ public class UserController {
 
     @PostMapping("/logIn")
     public String log(Map<String, Object> model, @RequestParam String login, @RequestParam String password ) {
-        User user = userRepository.findByName(login);
-        Administrator admin = adminRepository.findByName(login);
-        if (admin==null && user==null)
+
+        User user = userService.getUserByName(login);
+        Administrator admin = administratorService.getAdministratorByName(login);
+        if (user==null && admin==null)
         {
             model.put("message", "user doesn't exists");
             return "logInPage";
@@ -90,63 +81,47 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/catalog/{id}")
     public String catalog(Map<String, Object> model, @PathVariable(value = "id") long id) {
-        Iterable<Product> products=productRepository.findAll();
-        model.put("products", products);
-
-        Optional<User>user=userRepository.findById(id);
-        ArrayList<User>users=new ArrayList<>();
-        user.ifPresent(users::add);
-        model.put("user", users.get(0));
-
+        model.put("products", productService.getNonegativeProducts());
+        model.put("user", userService.getUserById(id).get(0));
         return "catalog";
     }
 
-    @GetMapping("/productInfoForUser/{id}")
-    public String changeInfoAboutProduct(@PathVariable(value = "id") long id, Model model) {
-
-        Optional<Product> product=productRepository.findById(id);
-        Iterable<BooleanProperty> booleanProperties=booleanPropertiesRepository.findByProduct_Id(id);//ne tot id
-        Iterable<NumericalProperty> numericalProperties=numericalPropertiesRepository.findByProduct_Id(id);//ne tot i
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        model.addAttribute("product", prod);
-
-        model.addAttribute("booleanProperties", booleanProperties );
-
-        model.addAttribute("numericalProperties", numericalProperties );
+    @GetMapping("/productInfoForUser/{productId}/{userId}")
+    public String infoAboutProduct(@PathVariable(value = "productId") long id, @PathVariable(value = "userId") long userId, Model model) {
+        model.addAttribute("userId", userId);
+        model.addAttribute("product", productService.getProductById(id));
+        model.addAttribute("booleanProperties", productService.getBooleanPropertiesOfProductByProductId(id));
+        model.addAttribute("numericalProperties", productService.getNumericalPropertiesOfProductByProductId(id));
         return "infoAboutProductForUser";
     }
 
+    @PostMapping("/productInfoForUser/{productId}/{userId}")
+    public String buyProductProduct(@PathVariable(value = "productId") long productId, @PathVariable(value = "userId") long userId, @RequestParam Integer quantity) {
+        userService.addProductToUsersProductCart(userId, productId, quantity);
+
+        return "redirect:/productCurtPage/"+userService.getUserById(userId).get(0).getId().toString();
+    }
+
     @GetMapping("/buyProduct/{productId}/{userId}")
-    public String buy1Product(@PathVariable(value = "productId") long productId, @PathVariable(value = "userId") long userId, Model model) {
-        Optional<Product> product=productRepository.findById(productId);
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        prod.get(0).setQuantity(prod.get(0).getQuantity()-1);
+    public String buy1Product(@PathVariable(value = "productId") long productId, @PathVariable(value = "userId") long userId,Map<String, Object> model) {
+        if(userService.addProductToUsersProductCart(userId, productId, 1))
+        {
 
-        Optional<User> user=userRepository.findById(userId);
-        ArrayList<User>users=new ArrayList<>();
-        user.ifPresent(users::add);
-
-        if(!prod.get(0).getUsers().contains(users.get(0))){
-        prod.get(0).addUser(users.get(0));
-        productRepository.save(prod.get(0));}
-
-        users.get(0).addProductToProductCart(prod.get(0));
-        userRepository.save(users.get(0));
-        return "redirect:/productCurtPage/"+users.get(0).getId().toString();
+        return "redirect:/productCurtPage/"+userService.getUserById(userId).get(0).getId().toString();
+        }
+        else
+        {
+            return "redirect:/catalog/"+userService.getUserById(userId).get(0).getId().toString();
+        }
     }
 
     @GetMapping("/productCurtPage/{userId}")
-    public String pageOfProducts( Model model, @PathVariable(value = "userId") long userId) {
-        Optional<User> user=userRepository.findById(userId);
-        ArrayList<User>users=new ArrayList<>();
-        user.ifPresent(users::add);
-        model.addAttribute("products", users.get(0).getProductCart());
-        model.addAttribute("cost", users.get(0).getCostOfProductsInProductCart());
+    public String productCartPage( Model model, @PathVariable(value = "userId") long userId) {
+        model.addAttribute("products", userService.getUserById(userId).get(0).getProductCart());
+        model.addAttribute("cost", userService.getUserById(userId).get(0).getCostOfProductsInProductCart());
         return "productCurtPage";
     }
+
 }

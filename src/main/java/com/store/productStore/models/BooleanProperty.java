@@ -31,11 +31,9 @@ public class BooleanProperty extends Property {
         this.propertyValue=propertyValue;
 
     }
-
-
     @Override
     public String toString() {
-        return "BooleanProperty{" +
+        return "DoubleProperty{" +
                 "propertyValue=" + propertyValue +
                 ", propertyName='" + propertyName + '\'' +
                 ", id=" + id +

@@ -5,14 +5,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
+<a href="/homePage">выйти</a><br>
 <a th:href="'/productCurtPage/'+${user.id}">корзина</a><br>
 
+<th:block th:if="${message}">
+
+    <input type="password" name="repeatPassword" placeholder="недостаточно товара"><br><br>
+
+</th:block>
 <div th:each="product : ${products}">
     <h3 th:text="${product.name}"></h3>
     <h3 th:text="${product.cost}"></h3>
 
     <a th:href="'/buyProduct/'+${product.id}+'/'+${user.id}">в корзину</a><br>
-    <a th:href="'/productInfoForUser/'+${product.id}">информация о продукте</a><br>
+    <a th:href="'/productInfoForUser/'+${product.id}+'/'+${user.id}">информация о продукте</a><br>
 </div>
 
 </body>

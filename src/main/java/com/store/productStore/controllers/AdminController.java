@@ -1,201 +1,104 @@
 package com.store.productStore.controllers;
 
-
-
-import com.store.productStore.models.*;
-import com.store.productStore.repositories.*;
+import com.store.productStore.services.AdministratorService;
+import com.store.productStore.services.ProductService;
+import com.store.productStore.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-
 @Controller
 public class AdminController {
-
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
-    private AdminRepository adminRepository;
+    private AdministratorService administratorService;
     @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private BooleanPropertyRepository booleanPropertyRepository;
-    @Autowired
-    private NumericalPropertiesRepository numericalPropertiesRepository;
-
+    private ProductService productService;
 
     @GetMapping("/pageOfUsers")
     public String pageOfUsers( Model model) {
-        Iterable<User> users=userRepository.findAll();
-        model.addAttribute("users", users);
-        Iterable<Administrator> admins=adminRepository.findAll();
-        model.addAttribute("admins", admins);
+        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("admins", administratorService.getAllAdmins());
         return "pageOfUsers";
     }
 
     @GetMapping("/addPage")
-    public String addPage( Model model) {
-
+    public String addPage() {
         return "addPage";
     }
 
-
     @PostMapping("/addPage")
-    public String add(@RequestParam String name, @RequestParam String password, Model model) {
-        Administrator admin=new Administrator(name, password);
-        adminRepository.save(admin);
-
+    public String add(@RequestParam String name, @RequestParam String password) {
+        administratorService.addAdmin(name, password);
         return "redirect:/pageOfUsers";
     }
 
     @GetMapping("/userDelete/{id}")
-    public String deleteUser(@PathVariable(value = "id") long id, Model model) {
-        Optional<User>user=userRepository.findById(id);
-        ArrayList<User>users=new ArrayList<>();
-        user.ifPresent(users::add);
-        List<Product>productCart=users.get(0).getProductCart();
-        if(productCart.size()!=0){
-            for(Product pr : productCart)
-            {
-                pr.removeUsersFromProduct(users.get(0));
-                productRepository.save(pr);
-            }
-        }
-        userRepository.deleteById(id);
-
+    public String deleteUser(@PathVariable(value = "id") long id) {
+        userService.deleteUserById(id);
         return "redirect:/pageOfUsers";
     }
 
     @GetMapping("/adminDelete/{id}")
-    public String deleteAdmin(@PathVariable(value = "id") long id, Model model) {
-        adminRepository.deleteById(id);
-
+    public String deleteAdmin(@PathVariable(value = "id") long id) {
+        administratorService.deleteAdminById(id);
         return "redirect:/pageOfUsers";
     }
 
     @GetMapping("/addProduct")
-    public String addProduct( Model model) {
-
+    public String addProduct() {
         return "addProduct";
     }
 
     @PostMapping("/addProduct")
-    public String add(@RequestParam String name, @RequestParam Double price, @RequestParam Integer quantity, Model model) {
-        Product product=new Product(name, price, quantity);
-        productRepository.save(product);
-
+    public String add(@RequestParam String name, @RequestParam Double price, @RequestParam Integer quantity) {
+        productService.addProduct(name, price, quantity);
         return "redirect:/pageOfProducts";
     }
 
     @GetMapping("/pageOfProducts")
     public String pageOfProducts( Model model) {
-        Iterable<Product> products=productRepository.findAll();
-        model.addAttribute("products", products);
+        model.addAttribute("products", productService.getAllProducts());
         return "pageOfProducts";
     }
 
     @GetMapping("/productDelete/{id}")
-    public String deleteProduct(@PathVariable(value = "id") long id, Model model) {
-        Optional<Product> product=productRepository.findById(id);
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        List<User> users=prod.get(0).getUsers();
-        if(users.size()!=0)
-        {
-            for(User user : users)
-            {
-            user.removeProductFromProductCart(prod.get(0));
-            userRepository.save(user);
-            }
-
-        }
-        productRepository.deleteById(id);
-
+    public String deleteProduct(@PathVariable(value = "id") long id) {
+        productService.deleteProductById(id);
         return "redirect:/pageOfProducts";
-    }
-
-
-
-    @PostMapping("/addBoolProperty/{id}")
-    public String addBooleanProperty(@PathVariable(value = "id") long id, Model model, @RequestParam String name, @RequestParam String valueOfProperty) {
-
-        Optional<Product> product=productRepository.findById(id);
-
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        BooleanProperty booleanProperty;
-        if(valueOfProperty.equals("true")){
-            booleanProperty = new BooleanProperty(name, true, prod.get(0));
-        }
-        else{
-            booleanProperty = new BooleanProperty(name, false, prod.get(0));
-        }
-        booleanPropertyRepository.save(booleanProperty);
-
-        return "redirect:/productInfo/{id}";
     }
 
     @GetMapping("/addBooleanProperty/{id}")
     public String addBoolean( @PathVariable(value = "id") long id, Model model) {
-
-        Optional<Product> product=productRepository.findById(id);
-
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        model.addAttribute("product", prod);
+        model.addAttribute("product", productService.getProductById(id));
         return "addBoolProperty";
-    }
-    @PostMapping("/addNumProperty/{id}")
-    public String addNumericalProperty(@PathVariable(value = "id") long id, Model model, @RequestParam String name, @RequestParam String valueOfProperty) {
-
-        Optional<Product> product=productRepository.findById(id);
-
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        NumericalProperty numericalProperty;
-
-        numericalProperty = new NumericalProperty(name, Double.parseDouble(valueOfProperty), prod.get(0));
-
-        numericalPropertiesRepository.save(numericalProperty);
-
-        return "redirect:/productInfo/{id}";
     }
 
     @GetMapping("/addNumericalProperty/{id}")
     public String addNumerical( @PathVariable(value = "id") long id, Model model) {
-
-        Optional<Product> product=productRepository.findById(id);
-
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        model.addAttribute("product", prod);
+        model.addAttribute("product", productService.getProductById(id));
         return "addNumProperty";
     }
 
+    @PostMapping("/addNumProperty/{id}")
+    public String addNumericalProperty(@PathVariable(value = "id") long id, @RequestParam String name, @RequestParam String valueOfProperty) {
+        productService.addNumericalProperty(id, name, valueOfProperty);
+        return "redirect:/productInfo/{id}";
+    }
 
+    @PostMapping("/addBoolProperty/{id}")
+    public String addBooleanProperty(@PathVariable(value = "id") long id, @RequestParam String name, @RequestParam String valueOfProperty) {
+        productService.addBooleanProperty(id, name, valueOfProperty);
+        return "redirect:/productInfo/{id}";
+    }
 
     @GetMapping("/productInfo/{id}")
     public String changeInfoAboutProduct(@PathVariable(value = "id") long id, Model model) {
-
-        Optional<Product> product=productRepository.findById(id);
-        Iterable<BooleanProperty> booleanProperties=booleanPropertyRepository.findByProduct_Id(id);//ne tot id
-        Iterable<NumericalProperty> numericalProperties=numericalPropertiesRepository.findByProduct_Id(id);//ne tot id
-        ArrayList<Product>prod=new ArrayList<>();
-        product.ifPresent(prod::add);
-        model.addAttribute("product", prod);
-
-        model.addAttribute("booleanProperties", booleanProperties );
-
-        model.addAttribute("numericalProperties", numericalProperties );
+        model.addAttribute("product", productService.getProductById(id));
+        model.addAttribute("booleanProperties", productService.getBooleanPropertiesOfProductByProductId(id));
+        model.addAttribute("numericalProperties", productService.getNumericalPropertiesOfProductByProductId(id));
         return "pageOfProduct";
     }
-
-
-
-
 }

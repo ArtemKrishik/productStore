@@ -6,6 +6,7 @@
     <title>Product</title>
 </head>
 <body>
+<th><a href="/pageOfProducts">назад</a><br></th>
 <div th:each="product : ${product}">
     <h3 th:text="${product.name}"></h3>
     <h3 th:text="${product.cost}"></h3>
